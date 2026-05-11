@@ -325,7 +325,8 @@ h3 {
 }
 
 .service-grid,
-.process-grid {
+.process-grid,
+.seo-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
@@ -333,7 +334,8 @@ h3 {
 
 .service-card,
 .process-grid div,
-.market-list div {
+.market-list div,
+.seo-grid article {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 24px;
@@ -342,9 +344,22 @@ h3 {
 
 .service-card p,
 .process-grid p,
-.market-list p {
+.market-list p,
+.seo-grid p {
   margin-bottom: 0;
   color: var(--muted);
+}
+
+.seo-content {
+  background: var(--ember);
+}
+
+.seo-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.seo-grid article {
+  min-height: 220px;
 }
 
 .results {
@@ -552,6 +567,35 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.faq {
+  background: var(--soft-gray);
+}
+
+.faq-list {
+  display: grid;
+  gap: 12px;
+  max-width: 980px;
+}
+
+.faq-list details {
+  border: 1px solid var(--mid-gray);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.faq-list summary {
+  cursor: pointer;
+  padding: 18px 20px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.faq-list p {
+  margin: 0;
+  padding: 0 20px 20px;
+  color: var(--muted);
+}
+
 .contact {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.72fr);
@@ -667,7 +711,8 @@ textarea {
     min-height: auto;
   }
 
-  .service-grid {
+  .service-grid,
+  .seo-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -710,6 +755,7 @@ textarea {
 
   .metric-grid,
   .service-grid,
+  .seo-grid,
   .result-stat-row,
   .process-grid,
   .site-footer {
