@@ -176,6 +176,15 @@ a {
   box-shadow: 0 18px 44px rgba(18, 18, 18, 0.35);
 }
 
+.nav-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -12px;
+  height: 12px;
+}
+
 .nav-dropdown:last-of-type .nav-panel {
   left: auto;
   right: 0;
@@ -226,6 +235,11 @@ a {
 
   .nav-dropdown.is-dismissed > .nav-panel {
     display: none;
+  }
+
+  #nav-areas {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    min-width: 440px;
   }
 }
 
@@ -964,6 +978,10 @@ textarea {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
+  }
+
+  .nav-panel::before {
+    content: none;
   }
 
   .nav-panel a {
