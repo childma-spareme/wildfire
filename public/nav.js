@@ -2,6 +2,8 @@ const header = document.querySelector(".site-header");
 const toggle = document.querySelector(".nav-toggle");
 const nav = document.querySelector("#site-nav");
 const desktopQuery = window.matchMedia("(min-width: 1121px)");
+const CLOSE_DELAY = 550;
+const SWITCH_DELAY = 150;
 
 if (header) {
   window.addEventListener("scroll", () => {
@@ -21,6 +23,8 @@ function setDropdown(drop, open) {
 }
 
 const closeTimers = new WeakMap();
+let switchTimer = null;
+let switchTarget = null;
 
 function cancelDropdownClose(drop) {
   const timer = closeTimers.get(drop);
@@ -30,15 +34,23 @@ function cancelDropdownClose(drop) {
   }
 }
 
+function cancelSwitch() {
+  if (switchTimer) {
+    clearTimeout(switchTimer);
+    switchTimer = null;
+  }
+  switchTarget = null;
+}
+
 function scheduleDropdownClose(drop) {
   cancelDropdownClose(drop);
   const timer = window.setTimeout(() => {
     closeTimers.delete(drop);
-    if (!desktopQuery.matches || drop.matches(":hover") || drop.classList.contains("is-dismissed")) return;
+    if (!desktopQuery.matches || drop.matches(":hover") || drop.classList.contains("is-dismissed") || drop.dataset.pressing === "true") return;
     delete drop.dataset.pinned;
     if (drop.contains(document.activeElement)) return;
     setDropdown(drop, false);
-  }, 200);
+  }, CLOSE_DELAY);
   closeTimers.set(drop, timer);
 }
 
@@ -49,6 +61,26 @@ function closeDropdowns(except) {
       setDropdown(drop, false);
     }
   });
+}
+
+function openDropdown(drop) {
+  cancelSwitch();
+  cancelDropdownClose(drop);
+  drop.classList.remove("is-dismissed");
+  closeDropdowns(drop);
+  setDropdown(drop, true);
+}
+
+function scheduleSwitch(drop) {
+  if (switchTarget === drop) return;
+  cancelSwitch();
+  switchTarget = drop;
+  switchTimer = window.setTimeout(() => {
+    switchTimer = null;
+    switchTarget = null;
+    if (!desktopQuery.matches || !drop.matches(":hover")) return;
+    openDropdown(drop);
+  }, SWITCH_DELAY);
 }
 
 function setMenu(open) {
@@ -75,48 +107,83 @@ dropdowns().forEach((drop) => {
   const button = drop.querySelector(".nav-drop");
   if (!button) return;
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", (event) => {
+    const hubLink = button.matches("a[href='/who-we-help/']");
+    if (hubLink && desktopQuery.matches) return;
+    if (hubLink) event.preventDefault();
     cancelDropdownClose(drop);
+    cancelSwitch();
     drop.classList.remove("is-dismissed");
     const open = drop.classList.contains("is-open");
-    closeDropdowns(open ? null : drop);
-    setDropdown(drop, !open);
-    if (!open) drop.dataset.pinned = "true";
+    if (open) {
+      setDropdown(drop, false);
+      return;
+    }
+    openDropdown(drop);
+    drop.dataset.pinned = "true";
   });
 
   button.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowDown") return;
     event.preventDefault();
-    drop.classList.remove("is-dismissed");
-    closeDropdowns(drop);
-    setDropdown(drop, true);
+    openDropdown(drop);
     drop.dataset.pinned = "true";
     drop.querySelector(".nav-panel a")?.focus();
   });
 
   drop.addEventListener("focusin", () => {
     if (drop.classList.contains("is-dismissed") || !desktopQuery.matches) return;
-    button.setAttribute("aria-expanded", "true");
+    cancelDropdownClose(drop);
+    setDropdown(drop, true);
   });
 
   drop.addEventListener("mouseenter", () => {
     if (!desktopQuery.matches) return;
     cancelDropdownClose(drop);
     drop.classList.remove("is-dismissed");
-    if (dropdowns().some((item) => item.dataset.pinned === "true" && item !== drop)) return;
-    closeDropdowns(drop);
-    setDropdown(drop, true);
+    if (drop.classList.contains("is-open")) {
+      cancelSwitch();
+      return;
+    }
+    const anotherOpen = dropdowns().some((item) => item.classList.contains("is-open"));
+    if (anotherOpen) {
+      scheduleSwitch(drop);
+      return;
+    }
+    openDropdown(drop);
   });
 
   drop.addEventListener("mouseleave", () => {
     if (!desktopQuery.matches) return;
+    if (switchTarget === drop) cancelSwitch();
     scheduleDropdownClose(drop);
+  });
+
+  drop.addEventListener("pointerdown", () => {
+    drop.dataset.pressing = "true";
+  });
+
+  drop.addEventListener("pointerup", () => {
+    delete drop.dataset.pressing;
+  });
+
+  drop.addEventListener("pointercancel", () => {
+    delete drop.dataset.pressing;
   });
 
   drop.addEventListener("focusout", (event) => {
     if (drop.contains(event.relatedTarget)) return;
-    setDropdown(drop, false);
-    drop.classList.remove("is-dismissed");
+    if (drop.dataset.pressing === "true" || drop.matches(":hover")) return;
+    if (!desktopQuery.matches) {
+      setDropdown(drop, false);
+      drop.classList.remove("is-dismissed");
+      return;
+    }
+    window.setTimeout(() => {
+      if (drop.dataset.pressing === "true" || drop.matches(":hover") || drop.contains(document.activeElement)) return;
+      setDropdown(drop, false);
+      drop.classList.remove("is-dismissed");
+    }, 0);
   });
 });
 
@@ -125,6 +192,7 @@ document.addEventListener("keydown", (event) => {
   const openDrop = dropdowns().find((drop) => drop.classList.contains("is-open") || drop.contains(document.activeElement));
   if (openDrop) {
     cancelDropdownClose(openDrop);
+    cancelSwitch();
     setDropdown(openDrop, false);
     openDrop.classList.add("is-dismissed");
     openDrop.querySelector(".nav-drop")?.focus();
@@ -137,18 +205,19 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("click", (event) => {
-  if (!header || header.contains(event.target)) return;
+  if (!header || header.contains(event.target) || event.target.closest?.(".nav-dropdown")) return;
   closeDropdowns();
   if (toggle?.getAttribute("aria-expanded") === "true") setMenu(false);
 });
 
 nav?.querySelectorAll("a").forEach((link) => {
   link.addEventListener("click", () => {
-    if (!desktopQuery.matches) setMenu(false);
+    if (!desktopQuery.matches && !link.classList.contains("nav-drop")) setMenu(false);
   });
 });
 
 desktopQuery.addEventListener("change", () => {
+  cancelSwitch();
   closeDropdowns();
   if (desktopQuery.matches) setMenu(false);
 });
