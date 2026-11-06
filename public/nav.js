@@ -20,9 +20,34 @@ function setDropdown(drop, open) {
   if (!open) delete drop.dataset.pinned;
 }
 
+const closeTimers = new WeakMap();
+
+function cancelDropdownClose(drop) {
+  const timer = closeTimers.get(drop);
+  if (timer) {
+    clearTimeout(timer);
+    closeTimers.delete(drop);
+  }
+}
+
+function scheduleDropdownClose(drop) {
+  cancelDropdownClose(drop);
+  const timer = window.setTimeout(() => {
+    closeTimers.delete(drop);
+    if (!desktopQuery.matches || drop.matches(":hover") || drop.classList.contains("is-dismissed")) return;
+    delete drop.dataset.pinned;
+    if (drop.contains(document.activeElement)) return;
+    setDropdown(drop, false);
+  }, 200);
+  closeTimers.set(drop, timer);
+}
+
 function closeDropdowns(except) {
   dropdowns().forEach((drop) => {
-    if (drop !== except) setDropdown(drop, false);
+    if (drop !== except) {
+      cancelDropdownClose(drop);
+      setDropdown(drop, false);
+    }
   });
 }
 
@@ -51,6 +76,7 @@ dropdowns().forEach((drop) => {
   if (!button) return;
 
   button.addEventListener("click", () => {
+    cancelDropdownClose(drop);
     drop.classList.remove("is-dismissed");
     const open = drop.classList.contains("is-open");
     closeDropdowns(open ? null : drop);
@@ -75,6 +101,7 @@ dropdowns().forEach((drop) => {
 
   drop.addEventListener("mouseenter", () => {
     if (!desktopQuery.matches) return;
+    cancelDropdownClose(drop);
     drop.classList.remove("is-dismissed");
     if (dropdowns().some((item) => item.dataset.pinned === "true" && item !== drop)) return;
     closeDropdowns(drop);
@@ -83,10 +110,7 @@ dropdowns().forEach((drop) => {
 
   drop.addEventListener("mouseleave", () => {
     if (!desktopQuery.matches) return;
-    drop.classList.remove("is-dismissed");
-    delete drop.dataset.pinned;
-    if (drop.contains(document.activeElement)) return;
-    setDropdown(drop, false);
+    scheduleDropdownClose(drop);
   });
 
   drop.addEventListener("focusout", (event) => {
@@ -100,6 +124,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   const openDrop = dropdowns().find((drop) => drop.classList.contains("is-open") || drop.contains(document.activeElement));
   if (openDrop) {
+    cancelDropdownClose(openDrop);
     setDropdown(openDrop, false);
     openDrop.classList.add("is-dismissed");
     openDrop.querySelector(".nav-drop")?.focus();
