@@ -941,6 +941,60 @@ textarea {
   margin: 0;
 }
 
+.town-photo-strip,
+[class$="-photo-strip"] {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.town-photo-strip figure,
+[class$="-photo-strip"] figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(18, 18, 18, 0.1);
+}
+
+.town-photo-strip img,
+[class$="-photo-strip"] img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.town-photo-strip figcaption,
+[class$="-photo-strip"] figcaption,
+figure.town-inline-photo figcaption {
+  padding: 10px 12px;
+  color: var(--ink);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.photo-credits {
+  margin: 12px 0 0;
+  color: var(--dark-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.photo-credits a {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .town-photo-strip,
+  [class$="-photo-strip"] {
+    grid-template-columns: 1fr;
+  }
+}
+
 .nav-divider {
   display: block;
   height: 1px;
