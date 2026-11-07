@@ -1094,9 +1094,10 @@ figure.town-inline-photo figcaption {
     right: 0;
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
     gap: 0;
     max-height: calc(100vh - 72px);
-    overflow: auto;
+    overflow-y: auto;
     padding: 6px 18px 18px;
     border-bottom: 1px solid var(--dark-line);
     background: #25282c;
