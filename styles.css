@@ -1165,3 +1165,91 @@ figure.town-inline-photo figcaption {
     overflow: hidden;
   }
 }
+
+/* Who We Help mega-menu */
+.nav-group-label{
+  display:block;
+  padding:10px 12px 6px;
+  color:var(--flame-hot);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.nav-panel-mega{
+  padding:14px 14px 10px;
+}
+.nav-mega-grid{
+  display:grid;
+  grid-template-columns:repeat(5, minmax(148px, 1fr));
+  gap:4px 14px;
+  align-items:start;
+}
+.nav-mega-col{
+  display:grid;
+  gap:0;
+  min-width:0;
+}
+.nav-panel-mega a{
+  width:auto;
+  margin:0;
+  padding:7px 12px;
+  min-height:38px;
+  white-space:normal;
+  line-height:1.25;
+}
+.nav-panel-mega a:last-child{
+  margin-bottom:0;
+  padding-bottom:7px;
+}
+.nav-mega-all{
+  display:flex !important;
+  width:auto !important;
+  margin:10px 0 0 !important;
+  padding:10px 12px !important;
+  border-top:1px solid rgba(255,255,255,.12);
+  color:var(--flame-hot) !important;
+  font-weight:800;
+}
+.nav-mega-all:hover,.nav-mega-all:focus-visible{
+  background:#f05a2829;
+  color:var(--paper) !important;
+}
+@media(min-width:1121px){
+  #nav-who.nav-panel-mega{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    min-width:min(1080px, calc(100vw - 48px));
+    width:min(1080px, calc(100vw - 48px));
+    max-width:calc(100vw - 32px);
+  }
+  /* keep hover bridge */
+  #nav-who.nav-panel-mega:before{
+    left:-24px; right:-24px; top:-18px; height:18px;
+  }
+  #nav-who.nav-panel-mega:after{
+    left:-24px; right:-24px; bottom:-18px;
+  }
+}
+@media(max-width:1280px) and (min-width:1121px){
+  #nav-who.nav-panel-mega{
+    min-width:min(980px, calc(100vw - 40px));
+    width:min(980px, calc(100vw - 40px));
+  }
+  .nav-mega-grid{grid-template-columns:repeat(5, minmax(130px, 1fr)); gap:2px 10px;}
+  .nav-panel-mega a{font-size:.84rem; padding:6px 10px; min-height:36px;}
+}
+@media(max-width:1120px){
+  .nav-mega-grid{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+  .nav-mega-col{padding:4px 0 8px; border-bottom:1px solid rgba(255,255,255,.08);}
+  .nav-mega-col:last-child{border-bottom:0;}
+  .nav-group-label{padding:12px 12px 4px;}
+  .nav-panel-mega{padding:0 0 8px 0; background:transparent; border:0; box-shadow:none;}
+  .nav-mega-all{margin:8px 12px 0 !important; border-top:1px solid rgba(255,255,255,.12);}
+}
