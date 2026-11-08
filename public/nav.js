@@ -2,8 +2,27 @@ const header = document.querySelector(".site-header");
 const toggle = document.querySelector(".nav-toggle");
 const nav = document.querySelector("#site-nav");
 const desktopQuery = window.matchMedia("(min-width: 1121px)");
-const CLOSE_DELAY = 550;
-const SWITCH_DELAY = 150;
+const CLOSE_DELAY = 450;
+const SWITCH_DELAY = 350;
+const CORRIDOR_PAD = 24;
+let lastPointer = null;
+
+document.addEventListener("pointermove", (event) => {
+  lastPointer = { x: event.clientX, y: event.clientY };
+}, { passive: true });
+
+// While a panel is open, the strip of header between the bar and the panel top
+// (as wide as the panel) counts as "inside", so moving sideways along the nav bar
+// toward a far column of the mega menu does not close it.
+function inCorridor(drop) {
+  if (!lastPointer || !drop.classList.contains("is-open")) return false;
+  const panel = drop.querySelector(".nav-panel");
+  if (!panel) return false;
+  const p = panel.getBoundingClientRect();
+  const h = header ? header.getBoundingClientRect() : { top: 0 };
+  const { x, y } = lastPointer;
+  return x >= p.left - CORRIDOR_PAD && x <= p.right + CORRIDOR_PAD && y >= h.top && y <= p.top + 4;
+}
 
 if (header) {
   window.addEventListener("scroll", () => {
@@ -46,7 +65,12 @@ function scheduleDropdownClose(drop) {
   cancelDropdownClose(drop);
   const timer = window.setTimeout(() => {
     closeTimers.delete(drop);
-    if (!desktopQuery.matches || drop.matches(":hover") || drop.classList.contains("is-dismissed") || drop.dataset.pressing === "true") return;
+    if (!desktopQuery.matches || drop.classList.contains("is-dismissed")) return;
+    if (drop.matches(":hover") || drop.dataset.pressing === "true") return;
+    if (inCorridor(drop)) {
+      scheduleDropdownClose(drop);
+      return;
+    }
     delete drop.dataset.pinned;
     if (drop.contains(document.activeElement)) return;
     setDropdown(drop, false);

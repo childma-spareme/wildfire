@@ -1254,3 +1254,18 @@ figure.town-inline-photo figcaption {
   .nav-panel-mega{padding:0 0 8px 0; background:transparent; border:0; box-shadow:none;}
   .nav-mega-all{margin:8px 12px 0 !important; border-top:1px solid rgba(255,255,255,.12);}
 }
+
+/* Desktop Who We Help mega menu: never cut off on short windows.
+   Scroll lives on the inner grid so the panel's hover bridges (::before/::after) are not clipped. */
+@media (min-width: 1121px) {
+  #nav-who.nav-panel-mega .nav-mega-grid {
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+}
+@media (min-width: 1121px) and (max-height: 820px) {
+  #nav-who.nav-panel-mega a { min-height: 32px; padding-top: 5px; padding-bottom: 5px; }
+  #nav-who .nav-group-label { padding-top: 6px; padding-bottom: 4px; }
+}
