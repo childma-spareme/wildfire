@@ -253,3 +253,48 @@ document.querySelectorAll("#site-nav a[href]").forEach((link) => {
   const target = href.replace(/\/$/, "") || "/";
   if (target === path) link.setAttribute("aria-current", "page");
 });
+
+// Conversion tracking: tap-to-call, mailto, and lead form submits.
+// Uses a beacon so the event can leave even when the browser starts a phone
+// dial or navigates away to Formspree. Does not prevent default actions.
+function trackGtag(name, params) {
+  if (typeof gtag !== "function") return;
+  gtag("event", name, params);
+}
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest && event.target.closest("a[href]");
+  if (!link) return;
+  const href = link.getAttribute("href") || "";
+  const text = (link.textContent || "").replace(/\s+/g, " ").trim();
+  if (/^tel:/i.test(href)) {
+    const phoneNumber = href.replace(/^tel:/i, "").replace(/\D/g, "");
+    trackGtag("phone_call", {
+      link_url: href,
+      phone_number: phoneNumber,
+      page_location: location.pathname,
+      link_text: text,
+      transport_type: "beacon"
+    });
+    return;
+  }
+  if (/^mailto:/i.test(href)) {
+    trackGtag("email_click", {
+      link_url: href,
+      page_location: location.pathname,
+      link_text: text,
+      transport_type: "beacon"
+    });
+  }
+});
+
+document.addEventListener("submit", (event) => {
+  const form = event.target;
+  if (!(form instanceof HTMLFormElement)) return;
+  if (form.id !== "lead-form" && !form.classList.contains("contact-form")) return;
+  trackGtag("generate_lead", {
+    form_id: form.id || "lead-form",
+    page_location: location.pathname,
+    transport_type: "beacon"
+  });
+});
