@@ -254,13 +254,19 @@
   </url>
   <url>
     <loc>https://wildfiredigitalmarketing.com/articles/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wildfiredigitalmarketing.com/articles/contractor-website-cost-wyoming/</loc>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://wildfiredigitalmarketing.com/articles/why-your-phone-isnt-ringing-from-google/</loc>
-    <lastmod>2026-11-09</lastmod>
+    <lastmod>2026-11-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
